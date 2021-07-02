@@ -1,18 +1,29 @@
+//Tsubaki Good End -g23 | flag_tubaki >= 2 | select1_1 | select2_1 |gt01.ks
+//Tsubaki Bad End - g23 | flag_tubaki = 0 | end before 'select0'
+//Kanon End - g34 | flag_kanon >= 1 |select1_2 | select2_end | gk01.ks
+//Kanon Good End - gk07 | select2_1
+//Kanon Bad End - gk07 | select2_2
+//Mizuha End - g42 | flag_mizuha >= 1 | storage="gm01.ks"
+//Mizuha Good End - gm04 | select1_2
+//Mizuha Bad End - gm04 | select1_1
+
+
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
 #include<stdbool.h>
 
-FILE *CurrentFile;
-FILE *NewFile;
+FILE *CurrentFile; //opens input files
+FILE *NewFile; //opnes output files
 
 bool ReadFile(char *file_name);
 char *ExtractText(const char *const string, const char *const start, const char *const end);
-void FileJumpPoint(char *file_name_f);
-void JumpAltEnd(char *currentLine_f);
-void JumpLine(char *currentLine_f);
-void PrintCharacterName(char *currentLine_f);
-void LineCleanup(char *currentLine_f);
+void PrintTitle(char *currentLine_f); //prints chapter titles
+void FileJumpTarget(char *file_name_f); //creates title jump links in different files
+void FileJumpLink(char *currentLine_f); //creates ending jump links in different files
+void JumpLink_Target(char *currentLine_f); //creates jump links and targets in same file
+void PrintCharacterName(char *currentLine_f); // prints name of the character who is currently speaking
+void LineCleanup(char *currentLine_f); //formats the line //cleans up unwanted characters or strings
 
 void main(int argc, char **argv)
 {
@@ -61,18 +72,29 @@ bool ReadFile(char *file_name)
 		exit(1);
 	}
 	
-	FileJumpPoint(file_name);
+	//prints a jump target at the beginning of a file
+	FileJumpTarget(file_name);
+	
+	//prints a chapter tag if the file is g01.ks because there aren't any identifier for chapter-1
+	if(strstr(file_name, "g01.ks"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Chapter 1</h2>\n");
 
+	//gets a newline in each iteration and validates that line until end of file is found
   while( (read = getline(&currentLine, &length, CurrentFile)) != EOF )
   {
 		//printf("%s\n", currentLine); //for debugging
 		
+		//goes here if line contains |storage=cp| and prints a chapter tag
+		if(strstr(currentLine, "storage=cp"))
+			PrintTitle(currentLine);
+		
+		//creates jump links in different files
 		if(strstr(currentLine, "@jump storage="))
-			JumpAltEnd(currentLine);
+			FileJumpLink(currentLine);
 			
 		//if the line contains choices than creates jump points
 		if(strstr(currentLine, "*select"))
-			JumpLine(currentLine);
+			JumpLink_Target(currentLine);
 		
 		//prints the name of the character who is currently speaking
 		if(strstr(currentLine, "nm t="))
@@ -85,7 +107,6 @@ bool ReadFile(char *file_name)
   
   fclose(NewFile);
   fclose(CurrentFile);
-  //free(currentLine);
 
   return true;
 }
@@ -118,20 +139,40 @@ char *ExtractText(const char *const string, const char *const start, const char 
     result[length] = '\0';
     memcpy(result, head, length);
 
-		//printf("%s\n", result); //prints unformatted string(for debugging)
+		//printf("%s\n", result); //for debugging
 
     return result;
 }
 
-void FileJumpPoint(char *file_name_f)
+void PrintTitle(char *currentLine_f)
 {
-	if(strstr(file_name_f, "g01.ks"))
-		fprintf(NewFile, "<p id=\"title\">----------------------------------------</p>\n");
-	else
-		fprintf(NewFile, "<p id=\"%s\">----------------------------------------</p>\n", ExtractText(file_name_f, "/", "."));
+	if(strstr(currentLine_f, "storage=cp_title02"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Chapter 2</h2>\n");
+	else if(strstr(currentLine_f, "storage=cp_title03"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Chapter 3</h2>\n");
+	else if(strstr(currentLine_f, "storage=cp_title04"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Chapter 4</h2>\n");
+	else if(strstr(currentLine_f, "storage=cp_title05"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Chapter 5</h2>\n");
+	else if(strstr(currentLine_f, "storage=cp_title06"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Chapter 6</h2>\n");
+	else if(strstr(currentLine_f, "storage=cp_tubaki"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Tsubaki Good End</h2>\n");
+	else if(strstr(currentLine_f, "storage=cp_kanon"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Kanon Good End</h2>\n");
+	else if(strstr(currentLine_f, "storage=cp_mizuha"))
+		fprintf(NewFile, "<h2 class = \"chapter\">Mizuha Good End</h2>\n");
 }
 
-void JumpAltEnd(char *currentLine_f)
+void FileJumpTarget(char *file_name_f)
+{
+	if(strstr(file_name_f, "g01.ks"))
+		fprintf(NewFile, "<p id=\"title\">--------------------</p>\n");
+	else
+		fprintf(NewFile, "<p id=\"%s\">--------------------</p>\n", ExtractText(file_name_f, "/", "."));
+}
+
+void FileJumpLink(char *currentLine_f)
 {	
 	if(strstr(currentLine_f, "@jump storage=\"title"))
 	{
@@ -153,11 +194,9 @@ void JumpAltEnd(char *currentLine_f)
 	{
 		fprintf(NewFile, "<a href=\"%s.html#%s\">Next</a><br><br>\n", ExtractText(currentLine_f, "storage=\"", ".ks"), ExtractText(currentLine_f, "storage=\"", ".ks") );
 	}
-
-	// && !strstr(file_name_f, "g55.ks") && !strstr(file_name_f, "gked.ks") && !strstr(file_name_f, "gmed.ks") && !strstr(file_name_f, "gted.ks") 
 }
 
-void JumpLine(char *currentLine_f)
+void JumpLink_Target(char *currentLine_f)
 {
 	//goes here if the line doesn't contain "exlink txt" and has "target" in it
 	//an example would be this - |@jump target="*select0" cond="f.flag_tubaki>0"|
@@ -179,8 +218,8 @@ void JumpLine(char *currentLine_f)
 	//goes here if the line starts with |*select|
 	else if( (currentLine_f[0] == '*') &&  (currentLine_f[1] == 's') && (currentLine_f[2] == 'e') && (currentLine_f[3] == 'l') )
 	{
-		//creates a jump point with id
-		fprintf(NewFile, "<p id=\"%s\">----------------------------------------</p>\n", ExtractText(currentLine_f, "*", "\n") );
+		//creates a jump target with id
+		fprintf(NewFile, "<p id=\"%s\">--------------------</p>\n", ExtractText(currentLine_f, "*", "\n") );
 	}
 	//goes here if the line starts with |exlink txt| and creates a jump link
 	else if(strstr(currentLine_f, "exlink txt="))
@@ -197,7 +236,6 @@ void JumpLine(char *currentLine_f)
 				ExtractText(currentLine_f, "target=\"*", "\""), ExtractText(currentLine_f, "exlink txt=", " target=") );
 		}
 	}
-	//free(currentLine_f);
 }
 
 void PrintCharacterName(char *currentLine_f)
@@ -257,13 +295,14 @@ void LineCleanup(char *currentLine_f)
 	int i, len;
 	char subline[3000];
 
-	i = 0;
 	len = strlen(currentLine_f);
 
-	for( ;i < len; i++)
+	for(i = 0;i < len; i++)
 	{
+		//enters if |[| is found and skips characters until |]| is found
 		if(currentLine_f[i] == '[')
 		{
+			//this loop only breaks after |]| is found
 			while(true)
 			{
 				i++;
