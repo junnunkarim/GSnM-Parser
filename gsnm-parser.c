@@ -5,11 +5,11 @@
 
 FILE *CurrentFile;
 FILE *NewFile;
-bool alt_end = false;
 
 bool ReadFile(char *file_name);
 char *ExtractText(const char *const string, const char *const start, const char *const end);
-void JumpAltEnd(char *currentLine_f, char *file_name_f);
+void FileJumpPoint(char *file_name_f);
+void JumpAltEnd(char *currentLine_f);
 void JumpLine(char *currentLine_f);
 void PrintCharacterName(char *currentLine_f);
 void LineCleanup(char *currentLine_f);
@@ -56,16 +56,19 @@ bool ReadFile(char *file_name)
   
   strcat(new_file_name, ".html");
   
- 	if( (NewFile = fopen(new_file_name,"w")) == NULL )
+ 	if( (NewFile = fopen(new_file_name, "w")) == NULL )
 	{
 		exit(1);
 	}
+	
+	FileJumpPoint(file_name);
 
   while( (read = getline(&currentLine, &length, CurrentFile)) != EOF )
   {
 		//printf("%s\n", currentLine); //for debugging
-
-		JumpAltEnd(currentLine, file_name);
+		
+		if(strstr(currentLine, "@jump storage="))
+			JumpAltEnd(currentLine);
 			
 		//if the line contains choices than creates jump points
 		if(strstr(currentLine, "*select"))
@@ -120,36 +123,38 @@ char *ExtractText(const char *const string, const char *const start, const char 
     return result;
 }
 
-void JumpAltEnd(char *currentLine_f, char *file_name_f)
+void FileJumpPoint(char *file_name_f)
+{
+	if(strstr(file_name_f, "g01.ks"))
+		fprintf(NewFile, "<p id=\"title\">----------------------------------------</p>\n");
+	else
+		fprintf(NewFile, "<p id=\"%s\">----------------------------------------</p>\n", ExtractText(file_name_f, "/", "."));
+}
+
+void JumpAltEnd(char *currentLine_f)
 {	
-		if(strstr(file_name_f, "gt01.ks") && (!alt_end))
-		{
-			fprintf(NewFile, "<p id=\"gt01\">------------------------------------------------------------</p>\n");
-			alt_end = true;
-		}
-		else if(strstr(file_name_f, "gk01.ks") && (!alt_end))
-		{
-			fprintf(NewFile, "<p id=\"gk01\">------------------------------------------------------------</p>\n");
-			alt_end = true;
-		}
-		else if(strstr(file_name_f, "gm01.ks") && (!alt_end))
-		{
-			fprintf(NewFile, "<p id=\"gm01\">------------------------------------------------------------</p>\n");
-			alt_end = true;
-		}
-		
-		if(strstr(currentLine_f, "@jump storage=\"gt01.ks\""))
-		{
-			fprintf(NewFile, "<a href=\"gt01.html#gt01\">Tsubaki End</a><br><br>\n");
-		}
-		else if(strstr(currentLine_f, "@jump storage=\"gk01.ks\""))
-		{
-			fprintf(NewFile, "<a href=\"gk01.html#gk01\">Kanon End</a><br><br>\n");
-		}
-		else if(strstr(currentLine_f, "storage=\"gm01.ks\""))
-		{
-			fprintf(NewFile, "<a href=\"gm01.html#gm01\">Mizuha End</a><br><br>\n");
-		}
+	if(strstr(currentLine_f, "@jump storage=\"title"))
+	{
+		fprintf(NewFile, "<i><b><a href=\"%s.html#%s\">End</a></b></i><br><br>\n", ExtractText(currentLine_f, "storage=\"", ".ks"), ExtractText(currentLine_f, "storage=\"", ".ks") );
+	}
+	else if(strstr(currentLine_f, "@jump storage=\"gk01"))
+	{
+		fprintf(NewFile, "<a href=\"%s.html#%s\">Kanon Ending</a><br><br>\n", ExtractText(currentLine_f, "storage=\"", ".ks"), ExtractText(currentLine_f, "storage=\"", ".ks") );
+	}
+	else if(strstr(currentLine_f, "@jump storage=\"gm01"))
+	{
+		fprintf(NewFile, "<a href=\"%s.html#%s\">Mizuha Ending</a><br><br>\n", ExtractText(currentLine_f, "storage=\"", ".ks"), ExtractText(currentLine_f, "storage=\"", ".ks") );
+	}
+	else if(strstr(currentLine_f, "@jump storage=\"gt01"))
+	{
+		fprintf(NewFile, "<a href=\"%s.html#%s\">Tsubaki Ending</a><br><br>\n", ExtractText(currentLine_f, "storage=\"", ".ks"), ExtractText(currentLine_f, "storage=\"", ".ks") );
+	}
+	else if(strstr(currentLine_f, "@jump storage="))
+	{
+		fprintf(NewFile, "<a href=\"%s.html#%s\">Next</a><br><br>\n", ExtractText(currentLine_f, "storage=\"", ".ks"), ExtractText(currentLine_f, "storage=\"", ".ks") );
+	}
+
+	// && !strstr(file_name_f, "g55.ks") && !strstr(file_name_f, "gked.ks") && !strstr(file_name_f, "gmed.ks") && !strstr(file_name_f, "gted.ks") 
 }
 
 void JumpLine(char *currentLine_f)
@@ -162,10 +167,10 @@ void JumpLine(char *currentLine_f)
 		if(strstr(currentLine_f, "cond="))
 		{
 			//creates a jump link with href
-			fprintf(NewFile, "<a href=\"#%s\">Click Here if %s</a>\n",
-					ExtractText(currentLine_f, "target=\"*", "\""), ExtractText(currentLine_f, "cond=\"f.", "\""));
+			fprintf(NewFile, "<a href=\"#%s\">Click Here if FLAG - %s</a>\n",
+					ExtractText(currentLine_f, "target=\"*", "\""), ExtractText(currentLine_f, "cond=\"f.flag_", "\""));
 		}
-		else 
+		else
 		{
 			fprintf(NewFile, "<a href=\"#%s\">Click Here</a>\n",
 					ExtractText(currentLine_f, "target=\"*", "\"") );
@@ -175,7 +180,7 @@ void JumpLine(char *currentLine_f)
 	else if( (currentLine_f[0] == '*') &&  (currentLine_f[1] == 's') && (currentLine_f[2] == 'e') && (currentLine_f[3] == 'l') )
 	{
 		//creates a jump point with id
-		fprintf(NewFile, "<p id=\"%s\">------------------------------------------------------------</p>\n", ExtractText(currentLine_f, "*", "\n") );
+		fprintf(NewFile, "<p id=\"%s\">----------------------------------------</p>\n", ExtractText(currentLine_f, "*", "\n") );
 	}
 	//goes here if the line starts with |exlink txt| and creates a jump link
 	else if(strstr(currentLine_f, "exlink txt="))
@@ -183,8 +188,8 @@ void JumpLine(char *currentLine_f)
 		//goes here if there is a flag in the line
 		if(strstr(currentLine_f, "exp="))
 		{
-			fprintf(NewFile, "<a href=\"#%s\">%s  [%s]</a><br><br>\n",
-				ExtractText(currentLine_f, "target=\"*", "\""), ExtractText(currentLine_f, "exlink txt=", " target="), ExtractText(currentLine_f, "exp=\"f.", "\"" ) );
+			fprintf(NewFile, "<a href=\"#%s\">%s  [FLAG - %s]</a><br><br>\n",
+				ExtractText(currentLine_f, "target=\"*", "\""), ExtractText(currentLine_f, "exlink txt=", " target="), ExtractText(currentLine_f, "exp=\"f.flag_", "\"" ) );
 		}
 		else
 		{
@@ -202,7 +207,7 @@ void PrintCharacterName(char *currentLine_f)
 
 	if(strstr(currentLine_f, "t=\"京介\""))
 	{
-		strcat(ch_name, "Azai Kyousuke");
+		strcat(ch_name, "Azai");
 		has_name = true;
 	}
 	else if(strstr(currentLine_f, "=tub"))
