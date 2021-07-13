@@ -265,7 +265,7 @@ void PrintCharacterName(char *currentLine_f)
 	}
 	else if(strstr(currentLine_f, "=onn"))
 	{
-		strcat(ch_name, "Person");
+		strcat(ch_name, "Miss Noriko");
 		has_name = true;
 	}
 	else if(strstr(currentLine_f, "=har"))
@@ -278,11 +278,132 @@ void PrintCharacterName(char *currentLine_f)
 		strcat(ch_name, "Kotani");
 		has_name = true;
 	}
-	/*else if(strstr(currentLine_f, ""))
+	else if(strstr(currentLine_f, "=suu"))
+	{
+		strcat(ch_name, "Math Teacher");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=uwe"))
+	{
+		strcat(ch_name, "Cafe Waiter");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=gon"))
+	{
+		strcat(ch_name, "Gonzou");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=pro"))
+	{
+		strcat(ch_name, "Producer");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=miz"))
+	{
+		strcat(ch_name, "Mizuha");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=som"))
+	{
+		strcat(ch_name, "Someya");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=mao"))
+	{
+		strcat(ch_name, "Maou");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=kuw"))
+	{
+		strcat(ch_name, "Kuwashima");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=aki"))
+	{
+		strcat(ch_name, "Dr. Akimoto");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=pen"))
+	{
+		strcat(ch_name, "Penguin guy");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=ch1"))
+	{
+		strcat(ch_name, "Child 1");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=ch2"))
+	{
+		strcat(ch_name, "Child 2");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=ten"))
+	{
+		strcat(ch_name, "Manager");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=hir"))
+	{
+		strcat(ch_name, "Hiroaki");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=pap"))
+	{
+		strcat(ch_name, "Tsubaki's Father");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=mam"))
+	{
+		strcat(ch_name, "Tsubaki's Mother");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=tir"))
+	{
+		strcat(ch_name, "Chiromi");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=tka"))
+	{
+		strcat(ch_name, "Tsubaki's Sibling 1");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=sae"))
+	{
+		strcat(ch_name, "Tsubaki's Sibling 2");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=sai"))
+	{
+		strcat(ch_name, "Mephistopheles");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=yuu"))
+	{
+		strcat(ch_name, "Ikuko");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=yuk"))
+	{
+		strcat(ch_name, "Yuki");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=ooo"))
+	{
+		strcat(ch_name, "Kannu");
+		has_name = true;
+	}
+	else if(strstr(currentLine_f, "=hah"))
+	{
+		strcat(ch_name, "Mom");
+		has_name = true;
+	}
+	else
 	{
 		strcat(ch_name, "Person");
 		has_name = true;
-	}*/
+	}
+	
 
 	if(has_name)
 		fprintf(NewFile, "\n<p class=\"name\"><b><i>%s-</i></b></p>\n", ch_name);
