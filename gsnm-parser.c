@@ -71,7 +71,10 @@ bool ReadFile(char *file_name)
 	{
 		exit(1);
 	}
-	
+
+
+	fprintf(NewFile, "<html><body>\n");
+
 	//prints a jump target at the beginning of a file
 	FileJumpTarget(file_name);
 	
@@ -105,6 +108,8 @@ bool ReadFile(char *file_name)
 			LineCleanup(currentLine);
   }
   
+	fprintf(NewFile, "</body></html>\n");
+
   fclose(NewFile);
   fclose(CurrentFile);
 
