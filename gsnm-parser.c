@@ -243,22 +243,22 @@ void PrintCharacterName(char *currentLine_f)
 	char ch_name[30] = "";
 	bool has_name = false;
 
-	if(strstr(currentLine_f, "t=\"京介\""))
+	if(strstr(currentLine_f, "nm t=\"京介\""))
 	{
-		strcat(ch_name, "Azai");
+		strcat(ch_name, "Kyousuke");
 		has_name = true;
 	}
-	else if(strstr(currentLine_f, "=tub"))
+	else if(strstr(currentLine_f, "=tub") || strstr(currentLine_f, "nm t=\"椿姫\""))
 	{
 		strcat(ch_name, "Tsubaki");
 		has_name = true;
 	}
-	else if(strstr(currentLine_f, "=eii"))
+	else if(strstr(currentLine_f, "=eii") || strstr(currentLine_f, "nm t=\"栄一\""))
 	{
 		strcat(ch_name, "Eiichi");
 		has_name = true;
 	}
-	else if(strstr(currentLine_f, "=kan"))
+	else if(strstr(currentLine_f, "=kan") || strstr(currentLine_f, "nm t=\"花音\""))
 	{
 		strcat(ch_name, "Kanon");
 		has_name = true;
@@ -268,7 +268,7 @@ void PrintCharacterName(char *currentLine_f)
 		strcat(ch_name, "Miss Noriko");
 		has_name = true;
 	}
-	else if(strstr(currentLine_f, "=har"))
+	else if(strstr(currentLine_f, "=har") || strstr(currentLine_f, "nm t=\"ハル\""))
 	{
 		strcat(ch_name, "Haru");
 		has_name = true;
@@ -325,7 +325,7 @@ void PrintCharacterName(char *currentLine_f)
 	}
 	else if(strstr(currentLine_f, "=pen"))
 	{
-		strcat(ch_name, "Penguin guy");
+		strcat(ch_name, "Penguin");
 		has_name = true;
 	}
 	else if(strstr(currentLine_f, "=ch1"))
@@ -406,7 +406,7 @@ void PrintCharacterName(char *currentLine_f)
 	
 
 	if(has_name)
-		fprintf(NewFile, "\n<p class=\"name\"><b><i>%s-</i></b></p>\n", ch_name);
+		fprintf(NewFile, "\n<p class=\"name\"><b><i>%s-</i></b></p>", ch_name);
 
 	strcpy(ch_name, "");
 }
